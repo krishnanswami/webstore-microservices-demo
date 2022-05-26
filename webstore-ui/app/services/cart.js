@@ -7,13 +7,15 @@ angular.module("app")
 
  	//baseUrl = $location.protocol() + '://cart-' + COOLSTORE_CONFIG.OCP_NAMESPACE + '.' + $location.host().replace(/^.*?\.(.*)/g,"$1") + '/api/cart';
 	// Following used for local testing
- 	baseUrl = 'http://localhost:8082/api/cart';
+ 	//baseUrl = 'http://localhost:9083/api/cart';
+	baseUrl = 'http://34.68.38.130:9083/api/cart';
 
 
 	factory.checkout_withBilling = function(ccinfo){
 		var deferred = $q.defer();
 		var orderId = "order-" + (Math.floor(Math.random() * 10000)) + "-" + cartId;
-        let billingInfo = {"orderId": orderId ,"total": cart.total, "creditCard": {"number": ccinfo.creditCard,"expiration": ccinfo.month+"/"+ccinfo.year,"nameOnCard": ccinfo.nameOnCard}, "billingAddress": ccinfo.shippingAddress, "name": ccinfo.nameOnCard};
+        //let billingInfo = {"orderId": orderId ,"total": cart.total, "creditCard": {"number": ccinfo.creditCard,"expiration": ccinfo.month+"/"+ccinfo.year,"nameOnCard": ccinfo.nameOnCard}, "billingAddress": ccinfo.shippingAddress, "name": ccinfo.nameOnCard};
+		let billingInfo = {"orderid": orderId ,"total": cart.total, "creditcard": ccinfo.creditCard, "billingaddress": ccinfo.shippingAddress, "name": ccinfo.nameOnCard};
         $http({
             method:'POST',
             url: baseUrl + '/checkout/' + cartId,

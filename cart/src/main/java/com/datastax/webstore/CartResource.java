@@ -60,5 +60,14 @@ public class CartResource {
                                @PathParam("quantity") int quantity) throws Exception {
         return shoppingCartService.deleteItem(cartId, itemId, quantity);
     }
-
+    
+    
+    @POST
+    @Path("/checkout/{cartId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ShoppingCart checkout(@PathParam("cartId") String cartId, Order order) {
+        //sendOrder(order, cartId);
+        return shoppingCartService.checkout(cartId, order);
+    }
 }

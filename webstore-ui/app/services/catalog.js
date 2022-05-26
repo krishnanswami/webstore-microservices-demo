@@ -6,7 +6,8 @@ angular.module("app")
 	var factory = {}, products, baseUrl;
 
     //baseUrl = $location.protocol() + '://catalog-' + COOLSTORE_CONFIG.OCP_NAMESPACE + '.' + $location.host().replace(/^.*?\.(.*)/g,"$1") + '/api/products';
-    baseUrl = 'http://localhost:8081/products';
+    //baseUrl = 'http://localhost:9081/products';
+    baseUrl = 'http://35.194.57.206:9081/products';
 
     factory.getProducts = function() {
 		var deferred = $q.defer();

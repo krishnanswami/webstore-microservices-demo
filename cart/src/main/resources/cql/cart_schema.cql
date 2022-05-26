@@ -3,7 +3,7 @@ create keyspace if not exists cart WITH replication = {'class': 'SimpleStrategy'
 use cart;
 
 create table if not exists cart_items(
-	cart_id UUID
+	cart_id UUID,
     inventory_itemid text,
     catalog_name text,
     catalog_description text,

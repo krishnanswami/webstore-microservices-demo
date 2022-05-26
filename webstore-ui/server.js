@@ -11,9 +11,9 @@ var express = require('express'),
     cors = require('cors');
 
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 9080,
     ip = process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    secport = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8443;
+    secport = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 9443;
 
 // Enable CORS support
 app.use(cors());

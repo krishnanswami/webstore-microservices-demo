@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 
@@ -23,7 +27,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private static final Logger log = LoggerFactory.getLogger(ShoppingCartServiceImpl.class);
 
-    private final String token = "AstraCS:dhdIZyEWUmvHsPXgUUZtQZnS:88fa2ad6e59d9ff7ed18617519834411d289b9c83ac11fa8a5358a852f6c5ae1";
+    @ConfigProperty(name = "astradb.token") 
+    String token;
+
+    //private final String token = "AstraCS:eXDPNNydhasfGStboxPDfAJH:96c1072290a1a62b80850c034ee36bdeb6aa92d7d93f257157692998d5b3f159";
+
+    //private final String token = "b2e70572-0427-47f1-a119-16e99cb65592";
 
     @Inject
     PromotionService ps;
@@ -33,6 +42,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @RestClient
     ShoppingDocumentService sds;
+
+    @RestClient
+    OrderService ors;
 
     private Map<String, Product> productMap = new HashMap<>();
 
@@ -51,12 +63,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         try {
             ShoppingCart cart = sds.get(token,"cart", "cart", cartId).getData();
+            log.info("Item found so pricing to the shopping cart {} ", cartId);
             priceShoppingCart(cart);
             sds.put(token, "cart", "cart", cartId, cart);
             return cart;
         } catch (Exception ex) {
             if (ex.getMessage().contains("status code 404"))
             {
+                log.info("No item found so adding to the shopping cart {} ", cartId);
                 ShoppingCart cart = new ShoppingCart(cartId);
                 sds.put(token, "cart", "cart", cartId, cart);
                 return cart;
@@ -135,7 +149,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         products.add(new Product("165614", "DataStax pen", "", 14.45, 54));
         products.add(new Product("165954", "DataStax Diary", "", 6.00, 87));
         products.add(new Product("444434", "Apache Cassandra T-shirt", "", 9.00, 443));
-        products.add(new Product("444435",  "DatStax Coffee Mug", "",13.00, 600));
+        products.add(new Product("444435",  "DataStax Coffee Mug", "",13.00, 600));
         products.add(new Product("444437", "DataStax Socks", "", 2.75, 230));
 
         return products;
@@ -164,17 +178,28 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return cart;
     }
 
-    /*
+    
 
     @Override
-    public ShoppingCart checkout(String cartId) {
+    public ShoppingCart checkout(String cartId, Order order) {
         ShoppingCart cart = getShoppingCart(cartId);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String orderjson = mapper.writeValueAsString(order);
+            log.info("Placing an Order {} ", orderjson); 
+            ors.post(token, "orders", "orders", orderjson);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+         }
+        
         cart.resetShoppingCartItemList();
         priceShoppingCart(cart);
         //carts.put(cartId, cart);
+        sds.put(token,"cart", "cart", cartId, cart);
         return cart;
     }
-    */
+    
 
     @Override
     public ShoppingCart addItem(String cartId, String itemId, int quantity) {
